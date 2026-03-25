@@ -1,5 +1,4 @@
-# AI-Powered Fraud Detection System 🚨
-
+# fraud-detection-risk-intelligence-system
 An end-to-end, real-time Machine Learning pipeline designed to intercept, predict, and explain fraudulent financial transactions.
 
 ## Architecture
