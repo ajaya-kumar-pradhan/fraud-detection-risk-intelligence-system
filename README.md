@@ -1,4 +1,4 @@
-# 🚨 FraudLens AI: Security Intelligence Platform
+# 🚨AI-Powered Fraud Detection System
 ### End-to-End Machine Learning | Classification | XGBoost | FastAPI | Streamlit + AI Chatbot
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?style=flat&logo=python)
