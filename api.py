@@ -31,7 +31,9 @@ class Transaction(BaseModel):
     newbalanceDest: float
     
 def preprocess(tx: Transaction) -> pd.DataFrame:
-    df = pd.DataFrame([tx.dict()])
+    # Handle both Pydantic v1 (.dict()) and v2 (.model_dump())
+    data = tx.model_dump() if hasattr(tx, 'model_dump') else tx.dict()
+    df = pd.DataFrame([data])
     
     df['errorBalanceOrig'] = df['newbalanceOrig'] + df['amount'] - df['oldbalanceOrg']
     df['errorBalanceDest'] = df['oldbalanceDest'] + df['amount'] - df['newbalanceDest']
