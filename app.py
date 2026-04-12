@@ -3,9 +3,10 @@ import requests
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 # Configuration & Constants
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
 
 def setup_page():
     """Configures the aesthetic layout of the dashboard."""
