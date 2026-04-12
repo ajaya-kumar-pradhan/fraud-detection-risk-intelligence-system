@@ -1,1 +1,0 @@
-# Data extraction logic\nimport pandas as pd\ndef load_data(path):\n    return pd.read_csv(path)\n

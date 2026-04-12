@@ -10,7 +10,7 @@ from pydantic import BaseModel
 app = FastAPI(title="Real-Time Fraud Detection API")
 
 # Load model and artifacts
-base_dir = r"C:\Users\ajaya\.gemini\antigravity\scratch\fraud_detection\model_artifacts"
+base_dir = os.path.join(os.path.dirname(__file__), "model_artifacts")
 model = xgb.XGBClassifier()
 model.load_model(os.path.join(base_dir, 'xgboost_fraud_model.json'))
 features = joblib.load(os.path.join(base_dir, 'feature_columns.pkl'))

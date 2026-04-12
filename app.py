@@ -4,187 +4,215 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ================================
-# 🔧 PAGE CONFIG
-# ================================
-st.set_page_config(
-    page_title="Fraud Detection System",
-    page_icon="🚨",
-    layout="wide"
-)
-
+# Configuration & Constants
 API_URL = "http://127.0.0.1:8000"
 
-# ================================
-# 🎯 HEADER
-# ================================
-st.title("🚨 AI-Powered Fraud Detection System")
-st.markdown("Detect suspicious financial transactions in real-time using Machine Learning")
-st.divider()
-
-# ================================
-# 🎛️ SIDEBAR INPUTS
-# ================================
-with st.sidebar:
-    st.header("⚙️ Transaction Details")
-    step = st.number_input("Step (Hours)", min_value=1, value=1)
-    type_tx = st.selectbox("Transaction Type", ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"])
-    amount = st.number_input("Transaction Amount", min_value=0.0, value=1000.0)
-    oldbalanceOrg = st.number_input("Old Balance (Sender)", value=5000.0)
-    newbalanceOrig = st.number_input("New Balance (Sender)", value=4000.0)
-    oldbalanceDest = st.number_input("Old Balance (Receiver)", value=0.0)
-    newbalanceDest = st.number_input("New Balance (Receiver)", value=1000.0)
-
-    predict_btn = st.button("🚀 Detect Fraud", type="primary", use_container_width=True)
-
-# ================================
-# 🚀 PREDICTION & DASHBOARD
-# ================================
-if predict_btn:
-    payload = {
-        "step": step,
-        "type": type_tx,
-        "amount": amount,
-        "oldbalanceOrg": oldbalanceOrg,
-        "newbalanceOrig": newbalanceOrig,
-        "oldbalanceDest": oldbalanceDest,
-        "newbalanceDest": newbalanceDest
-    }
+def setup_page():
+    """Configures the aesthetic layout of the dashboard."""
+    st.set_page_config(
+        page_title="Fraud Risk Intelligence",
+        page_icon="🛡️",
+        layout="wide"
+    )
     
-    with st.spinner("Analyzing risk..."):
-        try:
-            res = requests.post(f"{API_URL}/predict", json=payload)
-            if res.status_code == 200:
-                data = res.json()
-                prob = data["probability"]
-                is_fraud = data["is_fraud"]
-                risk_score = data["risk_score"]
+    # Custom CSS for a refined, professional appearance
+    st.markdown("""
+        <style>
+        .main {
+            background-color: #f8f9fa;
+        }
+        .stMetric {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .stButton>button {
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        h1, h2, h3 {
+            color: #1e293b;
+        }
+        .reportview-container .main .block-container {
+            padding-top: 2rem;
+        }
+        </style>
+    """, unsafe_content_allowed=True)
 
-                # ================================
-                # 💡 INSIGHTS / REAL-TIME ALERTS
-                # ================================
-                if prob > 0.7:
-                    st.error("🚨 HIGH-RISK FRAUD DETECTED: Immediate investigation recommended.")
-                elif prob > 0.4:
-                    st.warning("⚠️ MODERATE RISK: Monitor transaction closely.")
-                else:
-                    st.success("✅ Transaction appears safe.")
+class ControlPanel:
+    """Handles the sidebar configuration and transaction data entry."""
+    @staticmethod
+    def render():
+        with st.sidebar:
+            st.title("🛡️ Risk Parameters")
+            st.caption("Configure transaction details for real-time analysis")
+            
+            with st.container():
+                step = st.number_input("Step (Hours since start)", min_value=1, value=1)
+                type_tx = st.selectbox("Transaction Type", ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"])
+                amount = st.number_input("Amount ($)", min_value=0.0, value=2500.0, step=100.0)
                 
-                # ================================
-                # 📊 KPI CARDS
-                # ================================
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Fraud Probability", f"{prob*100:.2f}%")
-                
-                risk_level = "HIGH 🚨" if prob > 0.7 else "MEDIUM ⚠️" if prob > 0.4 else "LOW ✅"
-                c2.metric("Risk Level", risk_level)
-                
-                c3.metric("Prediction", "FRAUD" if is_fraud else "SAFE")
                 st.divider()
-
-                col_left, col_right = st.columns(2)
+                st.subheader("Balance Audit")
+                oldbalanceOrg = st.number_input("Sender Original Balance", value=5000.0)
+                newbalanceOrig = st.number_input("Sender Final Balance", value=2500.0)
                 
-                with col_left:
-                    # ================================
-                    # 📈 VISUALIZATION
-                    # ================================
-                    st.subheader("📊 Risk Score Visualization")
-                    fig1, ax1 = plt.subplots(figsize=(6,3))
-                    ax1.bar(["Fraud Risk"], [prob], color="red" if prob > 0.5 else "green", width=0.4)
-                    ax1.set_ylim(0, 1)
-                    ax1.set_ylabel("Probability")
-                    st.pyplot(fig1)
-                    
-                    # ================================
-                    # 🔄 WHAT-IF ANALYSIS
-                    # ================================
-                    st.subheader("🔄 What-if Analysis (Amount Variance)")
-                    st.caption("Simulating varied transaction amounts while proportionately adjusting final balances to maintain structural reality.")
-                    scenarios = []
-                    
-                    # Original structural offset logic
-                    error_orig_offset = newbalanceOrig + amount - oldbalanceOrg
-                    error_dest_offset = oldbalanceDest + amount - newbalanceDest
-                    
-                    for amt in [amount * 0.5, amount, amount * 1.5]:
-                        temp_payload = payload.copy()
-                        temp_payload["amount"] = amt
-                        
-                        # Adjust mathematically so we don't accidentally manufacture an accounting error
-                        temp_payload["newbalanceOrig"] = max(0.0, oldbalanceOrg - amt + error_orig_offset)
-                        temp_payload["newbalanceDest"] = max(0.0, oldbalanceDest + amt - error_dest_offset)
-                        
-                        temp_res = requests.post(f"{API_URL}/predict", json=temp_payload).json()
-                        scenarios.append({
-                            "Amount": str(amt),
-                            "Raw_Amt": amt,
-                            "Fraud Probability": round(temp_res["probability"] * 100, 2)
-                        })
-                    
-                    scenario_df = pd.DataFrame(scenarios)
-                    st.dataframe(scenario_df[["Amount", "Fraud Probability"]])
-                    
-                    st.subheader("📊 Scenario Risk Comparison")
-                    fig2, ax2 = plt.subplots(figsize=(6,3))
-                    ax2.bar(scenario_df["Amount"], scenario_df["Fraud Probability"], width=0.4, color="orange")
-                    ax2.set_xlabel("Transaction Amount ($)")
-                    ax2.set_ylabel("Fraud %")
-                    st.pyplot(fig2)
+                st.divider()
+                oldbalanceDest = st.number_input("Recipient Original Balance", value=0.0)
+                newbalanceDest = st.number_input("Recipient Final Balance", value=2500.0)
+                
+            return {
+                "step": step,
+                "type": type_tx,
+                "amount": amount,
+                "oldbalanceOrg": oldbalanceOrg,
+                "newbalanceOrig": newbalanceOrig,
+                "oldbalanceDest": oldbalanceDest,
+                "newbalanceDest": newbalanceDest,
+                "submit": st.button("Analyze Risk Profile", type="primary", use_container_width=True)
+            }
 
-                with col_right:
-                    # ================================
-                    # 🔥 SHAP EXPLAINABILITY
-                    # ================================
-                    st.subheader("🔍 SHAP Explainability")
-                    explain_res = requests.post(f"{API_URL}/explain", json=payload)
-                    if explain_res.status_code == 200:
-                        exp_data = explain_res.json()
-                        df_shap = pd.DataFrame(exp_data["shap_values"])
-                        
-                        st.markdown("Positive SHAP values actively push the model toward **Fraud**. Negative values push it toward **Safe**.")
-                        
-                        top_features = df_shap.head(5).copy()
-                        # Sort to make graph ordered
-                        top_features = top_features.sort_values(by="value", ascending=True)
-
-                        fig_shap, ax_shap = plt.subplots(figsize=(6,4))
-                        colors = ['red' if val > 0 else 'green' for val in top_features["value"]]
-                        ax_shap.barh(top_features["feature"], top_features["value"], color=colors)
-                        ax_shap.set_xlabel("SHAP Value (Impact)")
-                        st.pyplot(fig_shap)
-                        
-                        # ================================
-                        # 🤖 CHATBOT ("Why is this fraud?")
-                        # ================================
-                        st.subheader("🤖 Chatbot: \"Why is this fraud?\"")
-                        
-                        # Rule-based natural language generator
-                        top_driver = df_shap.iloc[0]
-                        second_driver = df_shap.iloc[1]
-                        
-                        explain_text = f"**AI Diagnostic:** I categorized this as **HIGH RISK** primarily because the `{top_driver['feature']}` is abnormal. " if is_fraud else f"**AI Diagnostic:** I categorized this as **SAFE** primarily because the `{top_driver['feature']}` appears normal. "
-                        
-                        if top_driver["value"] > 0:
-                            explain_text += f"This specific feature dramatically increased the probability of fraud (+{top_driver['value']:.2f} log-odds). "
-                        else:
-                            explain_text += f"This feature decreased the fraud risk (-{abs(top_driver['value']):.2f} log-odds). "
-                        
-                        if is_fraud and "errorBalance" in top_driver["feature"]:
-                            explain_text += "\n\n*Explanation:* Our internal accounting checks show a massive discrepancy between what the user had, what they transferred, and what their final balance was recorded as. This is a massive red flag for bypassing accounting rules during a cash-out!"
-                        
-                        explain_text += f"\n\nA secondary factor was the `{second_driver['feature']}`."
-
-                        if is_fraud:
-                            st.error(explain_text)
-                        else:
-                            st.info(explain_text)
-            else:
-                st.error("API did not return a valid response. Check backend logs.")
+class RiskAnalytics:
+    """Encapsulates prediction logic and visual reporting."""
+    
+    @staticmethod
+    def fetch_prediction(payload):
+        try:
+            response = requests.post(f"{API_URL}/predict", json=payload)
+            response.raise_for_status()
+            return response.json()
         except Exception as e:
-            st.error(f"Could not connect to Prediction API. Ensure it is running! Error: {e}")
+            st.error(f"Prediction Service Unavailable: {e}")
+            return None
 
-# ================================
-# 📋 FOOTER
-# ================================
-st.divider()
-st.caption("Built with Machine Learning • Fraud Detection System")
+    @staticmethod
+    def fetch_explanation(payload):
+        try:
+            response = requests.post(f"{API_URL}/explain", json=payload)
+            response.raise_for_status()
+            return response.json()
+        except Exception:
+            return None
+
+    @staticmethod
+    def display_metrics(data):
+        prob = data["probability"]
+        is_fraud = data["is_fraud"]
+        
+        cols = st.columns(3)
+        with cols[0]:
+            st.metric("Fraud Probability", f"{prob*100:.1f}%")
+        with cols[1]:
+            risk_label = "CRITICAL" if prob > 0.8 else "ELEVATED" if prob > 0.4 else "STABLE"
+            st.metric("Risk Status", risk_label)
+        with cols[2]:
+            st.metric("System Verdict", "FRAUDULENT" if is_fraud else "LEGITIMATE")
+
+    @staticmethod
+    def plot_sensitivity(api_payload):
+        st.subheader("📊 Volatility & Sensitivity")
+        st.write("Impact of transaction volume on probability score")
+        
+        variances = [0.5, 1.0, 2.0, 5.0]
+        base_amt = api_payload['amount']
+        results = []
+        
+        # Calculate structural offsets for consistent 'what-if' mapping
+        orig_offset = api_payload["newbalanceOrig"] + base_amt - api_payload["oldbalanceOrg"]
+        dest_offset = api_payload["oldbalanceDest"] + base_amt - api_payload["newbalanceDest"]
+
+        for mult in variances:
+            test_amt = base_amt * mult
+            test_payload = api_payload.copy()
+            test_payload["amount"] = test_amt
+            test_payload["newbalanceOrig"] = max(0.0, api_payload["oldbalanceOrg"] - test_amt + orig_offset)
+            test_payload["newbalanceDest"] = max(0.0, api_payload["oldbalanceDest"] + test_amt - dest_offset)
+            
+            res = RiskAnalytics.fetch_prediction(test_payload)
+            if res:
+                results.append({"Multiplier": f"{mult}x", "Prob": res["probability"]})
+        
+        if results:
+            df = pd.DataFrame(results)
+            fig, ax = plt.subplots(figsize=(7, 3))
+            ax.plot(df["Multiplier"], df["Prob"], marker='o', color='#2563eb', linewidth=2)
+            ax.set_ylim(0, 1)
+            ax.grid(axis='y', linestyle='--', alpha=0.7)
+            st.pyplot(fig)
+
+def main():
+    setup_page()
+    
+    st.title("Fraud Risk Intelligence Dashboard")
+    st.write("Real-time transactional integrity analysis & risk scoring engine")
+    
+    config = ControlPanel.render()
+    
+    if config["submit"]:
+        payload = {k: v for k, v in config.items() if k != "submit"}
+        
+        with st.status("Analyzing Transactional DNA...", expanded=True) as status:
+            st.write("Contacting intelligence API...")
+            data = RiskAnalytics.fetch_prediction(payload)
+            
+            if data:
+                status.update(label="Analysis Complete", state="complete", expanded=False)
+                
+                # Summary Alerts
+                if data["probability"] > 0.8:
+                    st.error("🚨 **High Risk Identified**: Transaction exhibits structural anomalies consistent with known fraud patterns.")
+                elif data["probability"] > 0.4:
+                    st.warning("⚠️ **Review Recommended**: Moderate risk profile detected. Verify recipient authenticity.")
+                else:
+                    st.success("✅ **Risk Verified**: Transaction appears legitimate within current systemic parameters.")
+                
+                RiskAnalytics.display_metrics(data)
+                st.divider()
+                
+                left, right = st.columns(2)
+                
+                with left:
+                    RiskAnalytics.plot_sensitivity(payload)
+                
+                with right:
+                    st.subheader("🔍 Interpretability Drivers")
+                    st.write("Mathematical signals contributing to the current risk score")
+                    
+                    explain_data = RiskAnalytics.fetch_explanation(payload)
+                    if explain_data:
+                        shap_df = pd.DataFrame(explain_data["shap_values"]).head(6)
+                        # Stylized horizontal bar chart
+                        fig, ax = plt.subplots(figsize=(7, 4))
+                        colors = ['#dc2626' if v > 0 else '#16a34a' for v in shap_df['value']]
+                        ax.barh(shap_df['feature'], shap_df['value'], color=colors)
+                        ax.invert_yaxis()
+                        st.pyplot(fig)
+                        
+                        # Conversational AI Diagnostic
+                        st.divider()
+                        top_feat = shap_df.iloc[0]['feature']
+                        impact = "increased" if shap_df.iloc[0]['value'] > 0 else "decreased"
+                        
+                        diag_style = st.info if not data["is_fraud"] else st.warning
+                        diag_style(f"**Diagnostic Summary:** The primary risk driver is `{top_feat}`, which {impact} the overall probability. This indicates a deviation in established balance flow behavior.")
+
+    else:
+        # Welcome State
+        st.info("Input transaction details in the sidebar to begin risk assessment.")
+        
+        # Placeholder/Landing visuals
+        colA, colB = st.columns(2)
+        with colA:
+            st.image("https://img.freepik.com/free-vector/security-concept-illustration_114360-463.jpg", use_container_width=True)
+        with colB:
+            st.markdown("""
+                ### System Features
+                - **Real-time Scoring**: Instant processing of transactional metadata.
+                - **Deep Explanation**: SHAP-based feature importance mapping.
+                - **What-If Simulations**: Test transaction sensitivity to amount variations.
+                - **Secure API Integration**: Backed by a high-concurrency XGBoost engine.
+            """)
+
+if __name__ == "__main__":
+    main()
