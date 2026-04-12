@@ -39,7 +39,7 @@ def setup_page():
             padding-top: 2rem;
         }
         </style>
-    """, unsafe_content_allowed=True)
+    """, unsafe_allow_html=True)
 
 class ControlPanel:
     """Handles the sidebar configuration and transaction data entry."""
