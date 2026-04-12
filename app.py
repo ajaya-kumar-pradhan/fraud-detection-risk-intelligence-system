@@ -84,7 +84,12 @@ class RiskAnalytics:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            st.error(f"Prediction Service Unavailable: {e}")
+            if "127.0.0.1" in API_URL:
+                st.error("### 🔌 Connection Failed\nThe Streamlit app cannot find the Backend API on this machine.")
+                st.info("**Fix:** Open a new terminal and run: `uvicorn api:app --port 8000`")
+            else:
+                st.error("### 🌐 Cloud Connection Failed\nThe Streamlit app cannot reach your deployed API.")
+                st.info(f"**Current API URL:** `{API_URL}`\n\n**Fix:** Verify your `BACKEND_URL` secret in Streamlit Cloud.")
             return None
 
     @staticmethod
