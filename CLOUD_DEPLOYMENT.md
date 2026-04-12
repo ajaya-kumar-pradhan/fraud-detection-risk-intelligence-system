@@ -1,51 +1,31 @@
-# 🚀 Cloud Deployment Guide
+# 🚀 Cloud Deployment Guide (Simplified)
 
-This guide will help you deploy your Fraud Risk Intelligence System to the cloud for free using **Render** (Backend) and **Streamlit Cloud** (Frontend).
-
----
-
-## 🏗️ Part 1: Deploying the Backend (FastAPI) on Render
-
-[Render.com](https://render.com/) is perfect for hosting your `api.py`.
-
-1.  **Create a Account**: Sign up at Render using your GitHub account.
-2.  **Create a New Web Service**:
-    *   Click **"New"** -> **"Web Service"**.
-    *   Connect your GitHub repository.
-3.  **Configure the Service**:
-    *   **Name**: `fraud-detection-api`
-    *   **Runtime**: `Python 3`
-    *   **Build Command**: `pip install -r requirements.txt`
-    *   **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
-    *   **Instance Type**: `Free`
-4.  **Wait for Deployment**: Render will build your app and give you a URL like `https://fraud-detection-api.onrender.com`. **Copy this URL.**
+Your Fraud Risk Intelligence System now uses a **Monolithic Architecture** (everything in one file). This makes deployment significantly easier and more reliable.
 
 ---
 
-## 🎨 Part 2: Deploying the Frontend on Streamlit Cloud
+## 🎨 Deployment on Streamlit Cloud (Recommended)
+
+Since the "brain" and the "UI" are now combined into `app.py`, you only need to deploy one app:
 
 1.  **Go to [share.streamlit.io](https://share.streamlit.io/)**.
 2.  **Deploy a New App**:
     *   Connect your GitHub repo.
     *   **Main file path**: `app.py`
-3.  **Set Environment Variables (Critical)**:
-    *   Before clicking "Deploy", click **"Advanced settings..."**.
-    *   Under **Secrets**, add your Backend URL like this:
-        ```toml
-        BACKEND_URL = "https://your-api-url-from-render.onrender.com"
-        ```
-4.  **Click Deploy!**
+    *   **Branch**: `main`
+3.  **Click Deploy!**
+
+Streamlit Cloud will automatically detect your `requirements.txt` and load your ML model. There are **no secrets or backend URLs** required anymore!
 
 ---
 
-## 🔗 How it Works
-The frontend (`app.py`) is now coded to look for an environment variable called `BACKEND_URL`. 
-- **Locally**: It defaults to `http://127.0.0.1:8000`.
-- **In the Cloud**: It uses the URL you provided in the Streamlit Secrets, allowing the two apps to talk to each other globally.
+## 🛠️ Performance & Scalability
+- **Direct Inference**: The app loads the XGBoost model directly into memory using `@st.cache_resource`, ensuring near-instant predictions.
+- **Joblib Serialization**: Feature metadata is loaded via `joblib` for maximum stability across different Python environments.
 
-## 🛠️ Testing Locally with Uvicorn
-If you want to run the "Uvicorn Server" on your local machine:
+## 💻 Local Execution
+To run the system on your computer:
 ```bash
-uvicorn api:app --host 127.0.0.1 --port 8000 --reload
+streamlit run app.py
 ```
-This starts the production-ready server and will auto-restart when you change the code.
+*(No second terminal or Uvicorn required)*
