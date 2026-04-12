@@ -1,177 +1,69 @@
-# Fraud Detection System
-### End-to-End Machine Learning | Classification | XGBoost | FastAPI | Streamlit + AI Chatbot
+# Fraud Risk Intelligence System
+### Decision Support Engine for Financial Transaction Security
+
+This repository contains a high-performance system designed to identify and analyze fraudulent patterns in financial transaction data. By combining gradient-boosted decision trees with real-time API services and an interactive investigation dashboard, it provides a comprehensive solution for security teams to monitor and mitigate risk.
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue?style=flat&logo=python)
 ![XGBoost](https://img.shields.io/badge/XGBoost-3.2-red?style=flat&logo=xgboost)
 ![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.3-orange?style=flat&logo=scikit-learn)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat&logo=fastapi)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.40-FF4B4B?style=flat&logo=streamlit)
-![Pandas](https://img.shields.io/badge/Pandas-2.3-150458?style=flat&logo=pandas)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen?style=flat)
 
 ---
 
-## 🚀 Problem Statement
+## 🏦 The Challenge
 
-Financial fraud is a multi-billion dollar problem causing significant losses and eroding customer trust. Legacy rule-based detection systems flag massive transaction volumes randomly (high false-positive rates) while missing sophisticated, subtle cash-out exploits.
-
-This project builds an **enterprise-grade Machine Learning fraud interception system** with a real-time REST API, an interactive investigation dashboard, and an AI-powered SHAP diagnostic chatbot—enabling security teams to detect and explain fraudulent anomalies instantly.
+Financial institutions face billions in losses annually due to sophisticated fraud exploits. Traditional rule-based systems often struggle with high false-positive rates or fail to detect subtle anomalies in complex transaction flows. This system addresses these challenges by analyzing transactional "DNA" and balance inconsistencies to identify risk markers in real-time.
 
 ---
 
-## 🎯 Objective
+## 🎯 Project Objectives
 
-- Classify fraudulent transactions in real-time.
-- Handle massive class imbalance (99.9% legitimate traffic).
-- Build a production-ready API + dashboard for fraud analysts.
-- Provide "What-If" scenario tracking for vulnerability testing.
-- Enable transparent AI querying via a SHAP-based Natural Language Chatbot.
-
----
-
-## 🧠 ML System Pipeline
-
-```
-Raw Data → Synthetic Data Handling → Feature Engineering → Cost-Sensitive Training (XGBoost) → Threshold Tuning → API Deployment → Interactive Dashboard
-```
+*   **Real-Time Classification:** Rapid identification of suspicious transactions using a low-latency API.
+*   **Handling Class Imbalance:** Optimization strategies for datasets with extreme imbalance (~0.13% fraud rate).
+*   **Analyst Intelligence:** A professional dashboard providing diagnostic insights into why specific transactions are flagged.
+*   **Risk Sensitivity Testing:** Tools to simulate transaction variations and observe their impact on risk scores.
 
 ---
 
-## 📊 Dataset
+## 📊 Dataset & Features
 
-| Property         | Detail                                    |
-|------------------|-------------------------------------------|
-| Records          | Over 6 Million simulated transactions      |
-| Imbalance        | ~0.13% Fraudulent                         |
-| Target Variable  | `isFraud` (Binary Classification)         |
-| Domain           | FinTech / Digital Banking                 |
-| Features         | Amounts, balances, transaction types      |
+The system is trained on a dataset of over **6 million transactions**, focusing on structural discrepancies between expected and actual balances.
 
----
+| Attribute | Detail |
+| :--- | :--- |
+| **Volume** | 6 Million+ Records |
+| **Domain** | Digital Banking / FinTech |
+| **Class Imbalance** | 0.13% Fraudulent Cases |
+| **Primary Vectors** | `TRANSFER` and `CASH_OUT` operations |
 
-## 🔍 Key Insights (EDA)
-
-- **Extreme Class Imbalance:** Fraud is exceptionally rare, requiring precision optimization over pure accuracy.
-- **Top predictors:**
-  - Structural discrepancies between expected balances and actual balances.
-  - Transaction Type (`TRANSFER` and `CASH_OUT` dominate fraud vectors).
-  - Transaction Volume (spikes triggering heuristic flags).
+### Feature Engineering
+We developed specialized features to capture accounting bypass exploits:
+- **`errorBalanceOrig`**: Discrepancy between sender's initial balance, transaction amount, and reported final balance.
+- **`errorBalanceDest`**: Discrepancy in the recipient's balance logic.
+- **`hour_of_day`**: Temporal patterns derived from transaction sequence steps.
 
 ---
 
-## ⚙️ Feature Engineering
+## ⚙️ Methodology & Performance
 
-Created **advanced engineered features** to capture accounting anomalies:
+### Model Optimization
+We utilized **XGBoost** with a cost-sensitive learning approach. By adjusting the `scale_pos_weight` parameter, we forced the model to prioritize detection of the rare minority class without the noise introduced by oversampling techniques like SMOTE.
 
-```python
-# ── Mathematical Discrepancy Features ──
-# Flagging when the math of the transfer doesn't add up (classic bypass exploit).
-errorBalanceOrig = newbalanceOrig + amount - oldbalanceOrg
-errorBalanceDest = oldbalanceDest + amount - newbalanceDest
-
-# ── Temporal Features ──
-hour_of_day = step % 24
-```
-
-| Feature              | Category    | Description                              |
-|----------------------|-------------|------------------------------------------|
-| errorBalanceOrig     | Accounting  | Sender's post-transaction balance discrepancy |
-| errorBalanceDest     | Accounting  | Receiver's post-transaction balance discrepancy|
-| hour_of_day          | Temporal    | Translates abstract sequence step into 24H cycle |
+### Evaluation Metrics
+We prioritize **Precision-Recall AUC (PR-AUC)** over traditional ROC-AUC. In fraud detection, it is critical that when an alert is generated, the likelihood of actual fraud is high to minimize operational fatigue for security analysts.
 
 ---
 
-## 🤖 Model Training & Evaluation
+## 🌐 System Architecture
 
-### Training Configuration (Cost-Sensitive XGBoost)
-Due to extreme imbalance, standard models fail or predict 0 universally. We utilized XGBoost natively weighted using `scale_pos_weight` to mathematically force the trees to care about the rare minority class, bypassing computationally heavy and noisy SMOTE techniques.
+### 1. Backend Service (`api.py`)
+A FastAPI-based REST service that provides endpoints for prediction and model interpretability.
+- `POST /predict`: Generates a real-time risk score.
+- `POST /explain`: Returns mathematical drivers for a specific transaction level.
 
-```python
-XGBClassifier(
-    n_estimators=100,
-    max_depth=6,
-    scale_pos_weight=imbalance_ratio,
-    learning_rate=0.1,
-    random_state=42
-)
-```
-
-### Approach
-- Threshold calibration maximizing F-Beta and PR-AUC.
-- Advanced Precision-Recall intersection tuning to minimize false-positives for human analysts.
-
----
-
-## 📈 Results
-
-**👉 Selected Model: XGBoost**
-
-### 🎯 Why PR-AUC?
-In fraud systems where negatives outnumber positives 1,000 to 1, ROC-AUC is misleading. The model was evaluated against **Precision-Recall AUC (PR-AUC)**, ensuring that when the AI alerts an analyst, the transaction is genuinely suspicious.
-
----
-
-## 🌐 Production System
-
-### FastAPI REST API (`api.py`)
-
-| Endpoint          | Method | Description                |
-|-------------------|--------|----------------------------|
-| `/predict`        | POST   | Real-time fraud scoring    |
-| `/explain`        | POST   | Extract SHAP driver forces |
-
-```bash
-# Example API call
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "step": 1,
-    "type": "CASH_OUT",
-    "amount": 10000.0,
-    "oldbalanceOrg": 10000.0,
-    "newbalanceOrig": 0.0,
-    "oldbalanceDest": 0.0,
-    "newbalanceDest": 0.0
-  }'
-
-# Response: {"is_fraud": true, "risk_score": 98, "probability": 0.982, "threshold": 0.96}
-```
-
-### Streamlit Dashboard (`app.py`)
-
-| Feature                  | Description                                         |
-|--------------------------|-----------------------------------------------------|
-| 📊 KPI Cards            | Fraud Probability, Alert Status, Risk Score         |
-| 📈 Forecast Chart        | Visual probability breakdown bar scales             |
-| 🔬 What-If Analysis      | Dynamic transaction amount hacking scenarios        |
-| 💬 AI Chatbot            | SHAP-driven mathematical diagnostic agent           |
-
----
-
-## 💬 AI Chatbot — Fraud AI Diagnostics
-
-The built-in Natural Language generator understands the background XGBoost trees via SHAP and responds with explainable insights:
-
-*Example Response:*
-> **AI Diagnostic:** I categorized this as **HIGH RISK** primarily because the `errorBalanceOrig` is abnormal. This specific feature dramatically increased the probability of fraud (+3.42 log-odds).
-> *Explanation: Our internal accounting checks show a massive discrepancy between what the user had, what they transferred, and what their final balance was recorded as. This is a massive red flag for bypassing accounting rules during a cash-out!*
-
----
-
-## 🔬 What-If Scenario Analysis
-
-| Scenario                    | What it Simulates                        |
-|-----------------------------|------------------------------------------|
-| 🏷️ Amount Variance          | Altering the target transfer footprint while proportionally maintaining logical accounting bounds to map the risk sensitivity gradient without injecting fake bugs. |
-
----
-
-## 💡 Business Impact
-
-- **Intercept Cash Outs** instantly before funds leave the domain.
-- **Explainable AI (XAI)** ensuring banking analysts trust the system.
-- **REST API integration** seamlessly attaching to existing transaction microservices.
-- **Reduced False Positives** preserving legitimate user experience.
+### 2. Investigation Dashboard (`app.py`)
+A professional-grade interface for risk analysts to input transaction details, view risk metrics, and perform sensitivity analysis through "What-If" simulations.
 
 ---
 
@@ -179,60 +71,50 @@ The built-in Natural Language generator understands the background XGBoost trees
 
 ```
 fraud-detection-risk-intelligence-system/
-│
-├── Fraud_Detection_ML.py         # Full ML pipeline (EDA + training)
-├── api.py                        # FastAPI REST API
-├── app.py                        # Streamlit Dashboard + AI Chatbot
-├── model_artifacts/
-│   ├── xgboost_fraud_model.json  # Trained XGBoost model
-│   ├── feature_columns.pkl       # Feature names list
-│   └── threshold.txt             # Calibrated decision threshold
-├── .gitignore
-├── requirements.txt
-├── DEPLOYMENT.md
-├── STREAMLIT_DOCKER_DEPLOYMENT.md
-└── README.md
+├── app.py                # Redesigned Investigation Dashboard
+├── api.py                # FastAPI REST Service
+├── Fraud_Detection_ML.py # Model Training & Pipeline logic
+├── model_artifacts/      # Serialized models and feature configurations
+├── README.md             # Technical Documentation
+└── requirements.txt      # Project Dependencies
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
+### 1. Installation
 ```bash
-# 1. Clone the repo
-git clone https://github.com/ajayakumarpradhan/fraud-detection-risk-intelligence-system.git
+git clone https://github.com/ajaya-kumar-pradhan/fraud-detection-risk-intelligence-system.git
 cd fraud-detection-risk-intelligence-system
-
-# 2. Install dependencies
 pip install -r requirements.txt
+```
 
-# 3. Train the model (generates model_artifacts/)
-python Fraud_Detection_ML.py
+### 2. Startup
+The system requires both the backend and frontend to be active.
 
-# 4. Start FastAPI (port 8000)
-python -m uvicorn api:app --port 8000
+**Start the Service Interface:**
+```bash
+uvicorn api:app --port 8000
+```
 
-# 5. Start Streamlit Dashboard (port 8501)
-python -m streamlit run app.py --server.port 8501
+**Start the Analyst Dashboard:**
+```bash
+streamlit run app.py
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technical Stack
 
-| Category         | Tools                                  |
-|------------------|----------------------------------------|
-| Language         | Python 3.10+                           |
-| ML Framework     | XGBoost, Scikit-learn, SHAP            |
-| Data Processing  | Pandas, NumPy                          |
-| Visualization    | Matplotlib                             |
-| API Framework    | FastAPI + Uvicorn                      |
-| Dashboard        | Streamlit                              |
-| Task Type        | Binary Classification (Fraud)          |
+- **Language:** Python 3.10+
+- **Modeling:** XGBoost, Scikit-learn, SHAP
+- **Data:** Pandas, NumPy
+- **Communication:** FastAPI (Uvicorn), Requests
+- **Interface:** Streamlit, Matplotlib
 
 ---
 
 ## 👤 Author
-
 **Ajaya Kumar Pradhan**
 *Data Analyst | Machine Learning Enthusiast*
