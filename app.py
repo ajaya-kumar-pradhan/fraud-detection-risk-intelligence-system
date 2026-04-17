@@ -19,56 +19,59 @@ def setup_page():
         layout="wide"
     )
     
-    # 🏛️ Minimalist Stability System
+    # 🏛️ Ultra-Minimalist Stability System
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
         
-        /* 1. Reset & Global Stability */
+        /* 1. Global Stability Reset */
         html, body, [data-testid="stAppViewContainer"] {
             background-color: #ffffff !important;
             color: #1e293b;
             font-family: 'Outfit', sans-serif;
-            overflow-x: hidden !important;
+            overflow: hidden !important; 
         }
 
-        /* 2. Compact Minimal Cards */
+        /* 2. Flat Minimal Cards */
         .glass-card {
             background: #ffffff;
             border: 1px solid #f1f5f9;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
-        /* 3. Streamline Metrics */
+        /* 3. Static Metrics (No-Shaking) */
         [data-testid="stMetric"] {
             background: #f8fafc !important;
-            border: none;
-            border-radius: 8px;
+            border: 1px solid #f1f5f9;
+            border-radius: 6px;
             padding: 10px !important;
+            height: 90px !important; /* Fixed height to prevent vertical jitter */
+            overflow: hidden;
         }
-        [data-testid="stMetricLabel"] { font-size: 0.8rem !important; }
-        [data-testid="stMetricValue"] { font-size: 1.5rem !important; }
+        [data-testid="stMetricLabel"] { font-size: 0.75rem !important; color: #64748b !important; }
+        [data-testid="stMetricValue"] { font-size: 1.3rem !important; color: #0f172a !important; }
 
         /* 4. Minimal Buttons */
         .stButton>button {
             background: #0f172a;
             color: #ffffff !important;
-            border-radius: 8px;
-            padding: 10px;
-            font-weight: 600;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.9rem;
+            transition: none !important;
         }
 
-        /* 5. Clean Headers */
-        h1, h2, h3 {
+        /* 5. Typography */
+        h1, h2, h3, h4 {
             color: #0f172a !important;
-            margin-top: 0px !important;
-            letter-spacing: -0.5px;
+            margin: 0 !important;
+            padding-bottom: 8px !important;
         }
         
         #MainMenu, footer, header { visibility: hidden; }
+        .stDeployButton { display: none; }
         </style>
     """, unsafe_allow_html=True)
 
@@ -277,18 +280,18 @@ def main():
                 sens_results.append({"Multiplier": f"{mult}x", "Prob": t_prob})
             
             sens_df = pd.DataFrame(sens_results)
-            fig, ax = plt.subplots(figsize=(6, 2.5), facecolor='none')
+            fig, ax = plt.subplots(figsize=(5, 2), facecolor='none')
             ax.set_facecolor('none')
-            ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#4f46e5', linewidth=2)
+            ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#4f46e5', linewidth=1.5, markersize=5)
             ax.set_ylim(0, 1)
-            ax.tick_params(labelsize=8)
+            ax.tick_params(labelsize=7, colors='#64748b')
             for spine in ax.spines.values():
                 spine.set_color('#e2e8f0')
-            ax.grid(axis='y', linestyle='--', alpha=0.3)
-            st.pyplot(fig)
+            ax.grid(axis='y', linestyle='--', alpha=0.2)
+            st.pyplot(fig, use_container_width=True)
             
         with right:
-            st.subheader("🔍 Interpretability Drivers")
+            st.subheader("🔍 Factors")
             # SHAP Explanation
             shap_values = explainer.shap_values(df_processed)
             feature_imp = [
@@ -296,17 +299,17 @@ def main():
                 for f, val in zip(features, shap_values[0])
             ]
             feature_imp.sort(key=lambda x: abs(x["value"]), reverse=True)
-            shap_df = pd.DataFrame(feature_imp).head(5)
+            shap_df = pd.DataFrame(feature_imp).head(4)
             
-            fig_s, ax_s = plt.subplots(figsize=(6, 2.5), facecolor='none')
+            fig_s, ax_s = plt.subplots(figsize=(5, 2), facecolor='none')
             ax_s.set_facecolor('none')
             colors = ['#e11d48' if v > 0 else '#16a34a' for v in shap_df['value']]
             ax_s.barh(shap_df['feature'], shap_df['value'], color=colors)
             ax_s.invert_yaxis()
-            ax_s.tick_params(labelsize=8)
+            ax_s.tick_params(labelsize=7, colors='#64748b')
             for spine in ax_s.spines.values():
                 spine.set_color('#e2e8f0')
-            st.pyplot(fig_s)
+            st.pyplot(fig_s, use_container_width=True)
             
             # Diagnostic Text
             top_f = shap_df.iloc[0]['feature']
