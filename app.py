@@ -212,6 +212,7 @@ def main():
         if config["submit"]:
             st.markdown('<div class="glass-card">', unsafe_allow_html=True)
             st.subheader("🔮 Intelligence Result")
+            res_col1, res_col2 = st.columns([1, 1.5])
             
             with res_col1:
                 if is_fraud:
