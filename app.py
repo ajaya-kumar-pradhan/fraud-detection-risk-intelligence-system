@@ -244,7 +244,7 @@ def main():
         is_fraud = bool(proba >= threshold)
         
         # 📊 Intelligence Result (Redesigned)
-        if predict_clicked:
+        if config["submit"]:
             st.markdown('<div class="glass-card">', unsafe_allow_html=True)
             st.subheader("🔮 Intelligence Result")
             
