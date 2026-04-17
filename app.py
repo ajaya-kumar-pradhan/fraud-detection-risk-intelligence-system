@@ -19,32 +19,91 @@ def setup_page():
         layout="wide"
     )
     
+    # Stability & Premium Theme CSS
     st.markdown("""
         <style>
-        /* Fix for layout shaking */
-        html {
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        
+        /* 1. Global Reset & Theme */
+        html, body, [data-testid="stAppViewContainer"] {
+            background: radial-gradient(circle at 10% 20%, rgb(5, 8, 16) 0%, rgb(10, 15, 30) 90%);
+            color: #d1d5db;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
             overflow-anchor: none;
-            scroll-behavior: auto;
         }
-        .main {
-            background-color: #f8f9fa;
+
+        /* 2. Glassmorphism Design Token */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
-        .stMetric {
-            background-color: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            white-space: nowrap;
+        .glass-card:hover {
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
         }
+
+        /* 3. Metric Overhaul */
+        [data-testid="stMetric"] {
+            background: rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px !important;
+        }
+        [data-testid="stMetricLabel"] {
+            color: #94a3b8 !important;
+            font-size: 0.85rem !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        [data-testid="stMetricValue"] {
+            color: #00f2ff !important;
+            font-weight: 800 !important;
+        }
+
+        /* 4. Sidebar Modernization */
+        section[data-testid="stSidebar"] {
+            background-color: rgba(5, 8, 16, 0.5) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* 5. Custom Buttons */
         .stButton>button {
-            border-radius: 5px;
-            font-weight: 600;
+            width: 100%;
+            background: linear-gradient(90deg, #00f2ff, #0077ff);
+            color: #050810 !important;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Prevent header jumping */
+        .stButton>button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+            background: linear-gradient(90deg, #00ff88, #00f2ff);
+        }
+
+        /* 6. Typography & Headings */
         h1, h2, h3 {
-            color: #1e293b;
+            font-weight: 800 !important;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-top: 0px !important;
+            letter-spacing: -0.5px;
         }
+
+        /* 7. Stability Fix */
+        #MainMenu, footer, header { visibility: hidden; }
         </style>
     """, unsafe_allow_html=True)
 
@@ -153,9 +212,22 @@ class ControlPanel:
 def main():
     setup_page()
     
-    # Header
-    st.title("Fraud Risk Intelligence Dashboard")
-    st.write("Direct in-memory risk scoring & pattern analysis")
+    # 🛰️ High-Tech Top Bar
+    st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 2rem;">🛡️</span>
+                <div>
+                    <h2 style="margin: 0; line-height: 1;">FRAUD RISK INTELLIGENCE</h2>
+                    <p style="margin: 0; font-size: 0.7rem; color: #00f2ff; letter-spacing: 2px;">V5.0 MONOLITHIC ENGINE • LIVE</p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin: 0; font-size: 0.7rem; color: #94a3b8;">SYSTEM STATUS</p>
+                <p style="margin: 0; font-size: 0.8rem; color: #00ff88;">● OPERATIONAL</p>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     
     # Load Intelligence Engine
     with st.spinner("Initializing Intelligence Engine..."):
@@ -171,21 +243,60 @@ def main():
         proba = model.predict_proba(df_processed)[0][1]
         is_fraud = bool(proba >= threshold)
         
-        # Display Status
-        if proba > 0.8:
-            st.error("🚨 **High Risk Identified**: Transaction exhibits structural anomalies consistent with fraud patterns.")
-        elif proba > 0.4:
-            st.warning("⚠️ **Review Recommended**: Moderate risk profile detected. Verify recipient authenticity.")
-        else:
-            st.success("✅ **Risk Verified**: Transaction appears legitimate within current systemic parameters.")
+        # 📊 Intelligence Result (Redesigned)
+        if predict_clicked:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.subheader("🔮 Intelligence Result")
             
-        # 2. Metric Reporting
-        cols = st.columns(3)
-        cols[0].metric("Fraud Probability", f"{proba*100:.1f}%")
-        cols[1].metric("Risk Status", "CRITICAL" if proba > 0.8 else "ELEVATED" if proba > 0.4 else "STABLE")
-        cols[2].metric("System Verdict", "FRAUDULENT" if is_fraud else "LEGITIMATE")
-        
-        st.divider()
+            res_col1, res_col2 = st.columns([1, 1.5])
+            
+            with res_col1:
+                if is_fraud:
+                    st.markdown(f"""
+                        <div style="text-align: center; padding: 30px 10px; background: rgba(255, 0, 85, 0.05); border-radius: 20px; border: 1px solid #ff0055;">
+                            <h3 style="color: #ff0055; margin: 0; -webkit-text-fill-color: #ff0055;">⚠️ FRAUDULENT</h3>
+                            <p style="color: #d1d5db; font-size: 0.8rem; margin: 10px 0;">CRITICAL RISK IDENTIFIED</p>
+                            <h1 style="color: #fff; margin: 0; -webkit-text-fill-color: #fff;">{proba:.1%}<br><span style="font-size: 0.8rem; color: #94a3b8;">FRAUD PROBABILITY</span></h1>
+                        </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                        <div style="text-align: center; padding: 30px 10px; background: rgba(0, 255, 136, 0.05); border-radius: 20px; border: 1px solid #00ff88;">
+                            <h3 style="color: #00ff88; margin: 0; -webkit-text-fill-color: #00ff88;">✅ LEGITIMATE</h3>
+                            <p style="color: #d1d5db; font-size: 0.8rem; margin: 10px 0;">STABLE RISK PROFILE</p>
+                            <h1 style="color: #fff; margin: 0; -webkit-text-fill-color: #fff;">{(1-proba):.1%}<br><span style="font-size: 0.8rem; color: #94a3b8;">TRUST SCORE</span></h1>
+                        </div>
+                    """, unsafe_allow_html=True)
+            
+            with res_col2:
+                st.markdown(f"""
+                    <div style="padding-left: 20px;">
+                        <p style="margin-bottom: 5px; color: #94a3b8; font-size: 0.8rem;">ENGINE ANALYSIS</p>
+                        <p style="font-size: 0.95rem; line-height: 1.4; color: #d1d5db;">
+                        The transaction for <b>${payload['amount']:,.2f}</b> ({payload['type']}) has been evaluated against historical structural anomalies. 
+                        Verdict: { 'High priority review required' if proba > 0.8 else 'Manual audit recommended' if proba > 0.4 else 'Systemic verification successful' }.
+                        </p>
+                        <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid #00f2ff;">
+                            <span style="font-size: 0.75rem; color: #00f2ff; letter-spacing: 1px;">RISK GRADIENT SCAN</span><br>
+                            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px;">
+                                <div style="width: {proba*100}%; height: 100%; background: linear-gradient(90deg, #00f2ff, #0077ff); border-radius: 4px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);"></div>
+                            </div>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Sub-metrics (Mini Cards)
+            m_col1, m_col2, m_col3 = st.columns(3)
+            with m_col1:
+                st.metric("Fraud Probability", f"{proba*100:.1f}%")
+            with m_col2:
+                st.metric("Risk Status", "CRITICAL" if proba > 0.8 else "ELEVATED" if proba > 0.4 else "STABLE")
+            with m_col3:
+                st.metric("System Verdict", "FRAUDULENT" if is_fraud else "LEGITIMATE")
+            
+            st.divider()
         
         left, right = st.columns(2)
         
@@ -209,11 +320,16 @@ def main():
                 sens_results.append({"Multiplier": f"{mult}x", "Prob": t_prob})
             
             sens_df = pd.DataFrame(sens_results)
-            fig, ax = plt.subplots(figsize=(7, 3.5))
-            ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#2563eb', linewidth=2)
+            fig, ax = plt.subplots(figsize=(7, 3.5), facecolor='none')
+            ax.set_facecolor('none')
+            ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#00f2ff', linewidth=3, markersize=8)
             ax.set_ylim(0, 1)
-            ax.set_ylabel("Risk %")
-            ax.grid(axis='y', linestyle='--', alpha=0.5)
+            ax.set_ylabel("Risk %", color='#94a3b8')
+            ax.set_xlabel("Transaction Multiplier", color='#94a3b8')
+            ax.tick_params(colors='#94a3b8')
+            for spine in ax.spines.values():
+                spine.set_color('rgba(255,255,255,0.1)')
+            ax.grid(axis='y', linestyle='--', alpha=0.1)
             st.pyplot(fig)
             
         with right:
@@ -227,11 +343,15 @@ def main():
             feature_imp.sort(key=lambda x: abs(x["value"]), reverse=True)
             shap_df = pd.DataFrame(feature_imp).head(6)
             
-            fig_s, ax_s = plt.subplots(figsize=(7, 4))
-            colors = ['#dc2626' if v > 0 else '#16a34a' for v in shap_df['value']]
+            fig_s, ax_s = plt.subplots(figsize=(7, 4), facecolor='none')
+            ax_s.set_facecolor('none')
+            colors = ['#ff0055' if v > 0 else '#00ff88' for v in shap_df['value']]
             ax_s.barh(shap_df['feature'], shap_df['value'], color=colors)
             ax_s.invert_yaxis()
-            ax_s.set_xlabel("SHAP Value (Risk Impact)")
+            ax_s.set_xlabel("SHAP Impact Score", color='#94a3b8')
+            ax_s.tick_params(colors='#94a3b8')
+            for spine in ax_s.spines.values():
+                spine.set_color('rgba(255,255,255,0.1)')
             st.pyplot(fig_s)
             
             # Diagnostic Text
@@ -240,22 +360,45 @@ def main():
             diag_style(f"**Diagnostic Summary:** Primary risk driver identified as `{top_f}`. This factor is pushing the risk scoring toward {'Fraud' if shap_df.iloc[0]['value'] > 0 else 'Legitimate'} due to its statistical variance from historical baseline.")
 
     else:
-        # Landing Page
-        colA, colB = st.columns([1, 1.2])
+        # 🛸 Cyberpunk Landing Page
+        st.markdown('<div class="glass-card" style="padding: 60px 40px;">', unsafe_allow_html=True)
+        colA, colB = st.columns([1.1, 1], gap="large")
         with colA:
-            st.image("https://img.freepik.com/free-vector/security-concept-illustration_114360-463.jpg", use_container_width=True)
-        with colB:
             st.markdown("""
-                ### Integrated Governance Engine
-                This dashboard utilizes a monolithic architecture for high-performance risk monitoring.
-                
-                - **Direct In-Memory Inference**: Zero latency from external API calls.
-                - **Explainable Insights**: Real-time SHAP analysis for transaction transparency.
-                - **Stress Testing**: Built-in "What-If" scenarios to map risk sensitivity.
-                - **Accounting Audit**: Automated validation of transactional balance consistency.
-                
-                *Select transaction parameters in the sidebar to initiate a scan.*
-            """)
+                <h1 style="margin-bottom: 25px;">NEXT-GEN RISK<br><span style="color: #00f2ff; -webkit-text-fill-color: #00f2ff;">GOVERNANCE</span></h1>
+                <p style="font-size: 1.1rem; color: #94a3b8; line-height: 1.6;">
+                This dashboard utilizes a high-performance <b>Monolithic Architecture</b> for real-time financial tracking and anomaly detection.
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 35px;">
+                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: #00f2ff; font-weight: 800;">⚡ ZERO LATENCY</span><br>
+                        <span style="font-size: 0.8rem; color: #64748b;">Direct In-Memory Inference</span>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: #00ff88; font-weight: 800;">🔍 EXPLAINABLE</span><br>
+                        <span style="font-size: 0.8rem; color: #64748b;">Real-time SHAP Diagnostics</span>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: #ff0055; font-weight: 800;">🧪 STRESS TEST</span><br>
+                        <span style="font-size: 0.8rem; color: #64748b;">Predictive What-If Scenarios</span>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: #7000ff; font-weight: 800;">📝 AUDIT READY</span><br>
+                        <span style="font-size: 0.8rem; color: #64748b;">Automated Balance Verification</span>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+        with colB:
+            st.image("https://img.freepik.com/free-vector/digital-technology-background-vector-with-mesh-gradient-blue-pink_53876-136544.jpg", use_container_width=True)
+            st.markdown("""
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: #94a3b8; font-style: italic; font-size: 0.9rem;">
+                    "Empowering financial institutions with transparent, 
+                    deep-learning-driven risk mitigation."
+                    </p>
+                </div>
+            """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
