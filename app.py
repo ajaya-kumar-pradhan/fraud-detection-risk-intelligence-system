@@ -19,91 +19,68 @@ def setup_page():
         layout="wide"
     )
     
-    # Stability & Premium Theme CSS
+    # 🛰️ Hard Stability Design System
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
         
-        /* 1. Global Reset & Theme */
+        /* 1. Hard Layout Lock */
         html, body, [data-testid="stAppViewContainer"] {
-            background: radial-gradient(circle at 10% 20%, rgb(5, 8, 16) 0%, rgb(10, 15, 30) 90%);
+            background-color: #050810 !important;
             color: #d1d5db;
             font-family: 'Outfit', sans-serif;
-            overflow-x: hidden;
-            overflow-anchor: none;
+            overflow-x: hidden !important;
         }
 
-        /* 2. Glassmorphism Design Token */
+        /* 2. Stabilized Premium Cards (Solid Slate) */
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            background: #0d111c;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
             padding: 24px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        /* 3. Metric Overhaul */
+        /* 3. Metric Overhaul (No-Flicker) */
         [data-testid="stMetric"] {
-            background: rgba(0, 0, 0, 0.2) !important;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #161b26 !important;
+            border: 1px solid #1e293b;
             border-radius: 12px;
             padding: 15px !important;
+            white-space: nowrap !important;
         }
-        [data-testid="stMetricLabel"] {
-            color: #94a3b8 !important;
-            font-size: 0.85rem !important;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        [data-testid="stMetricValue"] {
-            color: #00f2ff !important;
-            font-weight: 800 !important;
-        }
+        [data-testid="stMetricLabel"] { color: #94a3b8 !important; }
+        [data-testid="stMetricValue"] { color: #00f2ff !important; font-weight: 800 !important; }
 
-        /* 4. Sidebar Modernization */
-        section[data-testid="stSidebar"] {
-            background-color: rgba(5, 8, 16, 0.5) !important;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* 5. Custom Buttons */
+        /* 4. Action Button (No-Jiggle) */
         .stButton>button {
             width: 100%;
-            background: linear-gradient(90deg, #00f2ff, #0077ff);
+            background: #00f2ff;
             color: #050810 !important;
             border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 10px;
             font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: none !important; /* Disable animations that cause shaking */
         }
         .stButton>button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
-            background: linear-gradient(90deg, #00ff88, #00f2ff);
+            background: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
         }
 
-        /* 6. Typography & Headings */
+        /* 5. Typography */
         h1, h2, h3 {
             font-weight: 800 !important;
-            background: linear-gradient(to right, #ffffff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff !important;
             margin-top: 0px !important;
-            letter-spacing: -0.5px;
+            -webkit-text-fill-color: initial !important;
+            background: none !important;
         }
 
-        /* 7. Stability Fix */
+        /* 6. Streamlit System Clean */
         #MainMenu, footer, header { visibility: hidden; }
+        .stDeployButton { display:none; }
         </style>
     """, unsafe_allow_html=True)
 
