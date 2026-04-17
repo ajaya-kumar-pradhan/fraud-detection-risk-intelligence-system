@@ -46,19 +46,40 @@ def setup_page():
 
 @st.cache_resource
 def load_assets():
-    """Loads model and artifacts once and caches them for performance."""
-    base_dir = os.path.join(os.path.dirname(__file__), "model_artifacts")
+    """Loads model and artifacts once and caches them for performance. Checks multiple locations."""
+    # List of possible locations
+    base_dirs = [
+        os.path.join(os.path.dirname(__file__), "model_artifacts"),
+        os.path.dirname(__file__) # Root directory
+    ]
     
+    model_path = None
+    features_path = None
+    threshold_path = None
+    
+    # Search for the files
+    for d in base_dirs:
+        m = os.path.join(d, 'xgboost_fraud_model.json')
+        f = os.path.join(d, 'feature_columns.joblib')
+        t = os.path.join(d, 'threshold.txt')
+        
+        if os.path.exists(m) and os.path.exists(f) and os.path.exists(t):
+            model_path, features_path, threshold_path = m, f, t
+            break
+            
+    if not model_path:
+        return None, None, None, None
+        
     # Load XGBoost Model
     model = xgb.XGBClassifier()
-    model.load_model(os.path.join(base_dir, 'xgboost_fraud_model.json'))
+    model.load_model(model_path)
     
-    # Load Feature Columns (now using .joblib)
-    features = joblib.load(os.path.join(base_dir, 'feature_columns.joblib'))
+    # Load Feature Columns
+    features = joblib.load(features_path)
     
     # Load Threshold
-    with open(os.path.join(base_dir, 'threshold.txt'), 'r') as f:
-        threshold = float(f.read().strip())
+    with open(threshold_path, 'r') as f_ptr:
+        threshold = float(f_ptr.read().strip())
         
     # Initialize SHAP Explainer
     explainer = shap.TreeExplainer(model)
