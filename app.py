@@ -16,62 +16,53 @@ def setup_page():
     st.set_page_config(
         page_title="Fraud Risk Intelligence",
         page_icon="🛡️",
-        layout="wide"
+        layout="centered"
     )
     
-    # 🏛️ Ultra-Minimalist Stability System
+    # 🏛️ Airline-Style Stability System
     st.markdown("""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
         
-        /* 1. Global Stability Reset */
         html, body, [data-testid="stAppViewContainer"] {
-            background-color: #ffffff !important;
+            background-color: #f8faff !important;
             color: #1e293b;
-            font-family: 'Outfit', sans-serif;
-            overflow: hidden !important; 
+            font-family: 'Inter', sans-serif;
         }
 
-        /* 2. Flat Minimal Cards */
         .glass-card {
             background: #ffffff;
-            border: 1px solid #f1f5f9;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* 3. Static Metrics (No-Shaking) */
         [data-testid="stMetric"] {
-            background: #f8fafc !important;
-            border: 1px solid #f1f5f9;
-            border-radius: 6px;
-            padding: 10px !important;
-            height: 90px !important; /* Fixed height to prevent vertical jitter */
-            overflow: hidden;
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px !important;
         }
-        [data-testid="stMetricLabel"] { font-size: 0.75rem !important; color: #64748b !important; }
-        [data-testid="stMetricValue"] { font-size: 1.3rem !important; color: #0f172a !important; }
 
-        /* 4. Minimal Buttons */
         .stButton>button {
-            background: #0f172a;
-            color: #ffffff !important;
-            border-radius: 6px;
-            padding: 8px;
-            font-size: 0.9rem;
-            transition: none !important;
+            width: 100%;
+            background: #4f46e5;
+            color: white !important;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            border: none;
         }
 
-        /* 5. Typography */
-        h1, h2, h3, h4 {
+        h1, h2, h3 {
             color: #0f172a !important;
-            margin: 0 !important;
-            padding-bottom: 8px !important;
+            font-weight: 800 !important;
+            margin-top: 0px !important;
         }
         
         #MainMenu, footer, header { visibility: hidden; }
-        .stDeployButton { display: none; }
         </style>
     """, unsafe_allow_html=True)
 
@@ -211,105 +202,64 @@ def main():
         proba = model.predict_proba(df_processed)[0][1]
         is_fraud = bool(proba >= threshold)
         
-        # 📊 Intelligence Result (Redesigned)
-        if config["submit"]:
-            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-            st.subheader("🔮 Intelligence Result")
-            res_col1, res_col2 = st.columns([1, 1.5])
-            
-            with res_col1:
-                if is_fraud:
-                    st.markdown(f"""
-                        <div style="text-align: center; padding: 20px; background: #fff1f2; border-radius: 12px; border: 1px solid #fda4af;">
-                            <h4 style="color: #be123c; margin: 0;">⚠️ FRAUD</h4>
-                            <h2 style="color: #be123c; margin: 0;">{proba:.1%}</h2>
-                        </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.markdown(f"""
-                        <div style="text-align: center; padding: 20px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0;">
-                            <h4 style="color: #15803d; margin: 0;">✅ SAFE</h4>
-                            <h2 style="color: #15803d; margin: 0;">{(1-proba):.1%}</h2>
-                        </div>
-                    """, unsafe_allow_html=True)
-            
-            with res_col2:
-                st.markdown(f"""
-                    <div style="padding-left: 10px;">
-                        <p style="font-size: 0.9rem; color: #334155;">
-                        <b>Scan Verdict:</b> { 'High Risk' if proba > 0.8 else 'Manual Review' if proba > 0.4 else 'Safe' }.
-                        </p>
-                        <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; margin-top: 10px; overflow: hidden;">
-                            <div style="width: {proba*100}%; height: 100%; background: #4f46e5; border-radius: 3px;"></div>
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            # Sub-metrics (Mini Cards)
-            m_col1, m_col2, m_col3 = st.columns(3)
-            with m_col1:
-                st.metric("Fraud Probability", f"{proba*100:.1f}%")
-            with m_col2:
-                st.metric("Risk Status", "CRITICAL" if proba > 0.8 else "ELEVATED" if proba > 0.4 else "STABLE")
-            with m_col3:
-                st.metric("System Verdict", "FRAUDULENT" if is_fraud else "LEGITIMATE")
-            
-            st.divider()
+        # 📊 Intelligence Result (Centered & Stable)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.subheader("🔮 Intelligence Result")
         
-        left, right = st.columns(2)
+        if is_fraud:
+            st.markdown(f"""
+                <div style="text-align: center; padding: 25px; background: #fff1f2; border-radius: 12px; border: 1px solid #fda4af; margin-bottom: 20px;">
+                    <h4 style="color: #be123c; margin: 0;">⚠️ FRAUDULENT DETECTED</h4>
+                    <h1 style="color: #be123c; margin: 0; font-size: 3rem;">{proba:.1%}</h1>
+                    <p style="color: #9f1239; margin-top: 10px;">HIGH RISK PROFILE IDENTIFIED</p>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+                <div style="text-align: center; padding: 25px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 20px;">
+                    <h4 style="color: #15803d; margin: 0;">✅ LEGITIMATE VERIFIED</h4>
+                    <h1 style="color: #15803d; margin: 0; font-size: 3rem;">{(1-proba):.1%}</h1>
+                    <p style="color: #166534; margin-top: 10px;">SYSTEMIC TRUST VERIFIED</p>
+                </div>
+            """, unsafe_allow_html=True)
+
+        # Sub-metrics
+        st.metric("Risk Probability", f"{proba*100:.1f}%")
+        st.metric("Risk Status", "CRITICAL" if proba > 0.8 else "ELEVATED" if proba > 0.4 else "STABLE")
         
-        with left:
-            st.subheader("📊 Performance Volatility")
-            # Sensitivity Analysis
-            variances = [0.5, 1.0, 2.0, 5.0]
-            sens_results = []
-            orig_offset = payload["newbalanceOrig"] + payload["amount"] - payload["oldbalanceOrg"]
-            dest_offset = payload["oldbalanceDest"] + payload["amount"] - payload["newbalanceDest"]
-            
-            for mult in variances:
-                test_amt = payload["amount"] * mult
-                test_payload = payload.copy()
-                test_payload["amount"] = test_amt
-                test_payload["newbalanceOrig"] = max(0.0, payload["oldbalanceOrg"] - test_amt + orig_offset)
-                test_payload["newbalanceDest"] = max(0.0, payload["oldbalanceDest"] + test_amt - dest_offset)
-                
-                t_df = preprocess_transaction(test_payload, features)
-                t_prob = model.predict_proba(t_df)[0][1]
-                sens_results.append({"Multiplier": f"{mult}x", "Prob": t_prob})
-            
-            sens_df = pd.DataFrame(sens_results)
-            fig, ax = plt.subplots(figsize=(5, 2), facecolor='none')
-            ax.set_facecolor('none')
-            ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#4f46e5', linewidth=1.5, markersize=5)
-            ax.set_ylim(0, 1)
-            ax.tick_params(labelsize=7, colors='#64748b')
-            for spine in ax.spines.values():
-                spine.set_color('#e2e8f0')
-            ax.grid(axis='y', linestyle='--', alpha=0.2)
-            st.pyplot(fig, use_container_width=True)
-            
-        with right:
-            st.subheader("🔍 Factors")
-            # SHAP Explanation
-            shap_values = explainer.shap_values(df_processed)
-            feature_imp = [
-                {"feature": f, "value": float(val)} 
-                for f, val in zip(features, shap_values[0])
-            ]
-            feature_imp.sort(key=lambda x: abs(x["value"]), reverse=True)
-            shap_df = pd.DataFrame(feature_imp).head(4)
-            
-            fig_s, ax_s = plt.subplots(figsize=(5, 2), facecolor='none')
-            ax_s.set_facecolor('none')
-            colors = ['#e11d48' if v > 0 else '#16a34a' for v in shap_df['value']]
-            ax_s.barh(shap_df['feature'], shap_df['value'], color=colors)
-            ax_s.invert_yaxis()
-            ax_s.tick_params(labelsize=7, colors='#64748b')
-            for spine in ax_s.spines.values():
-                spine.set_color('#e2e8f0')
-            st.pyplot(fig_s, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.divider()
+        
+        st.subheader("📊 Engine Stability")
+        sens_df = pd.DataFrame(sens_results)
+        fig, ax = plt.subplots(figsize=(6, 2.5), facecolor='none')
+        ax.set_facecolor('none')
+        ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#4f46e5', linewidth=1.5)
+        ax.set_ylim(0, 1)
+        ax.tick_params(labelsize=8, colors='#64748b')
+        for spine in ax.spines.values():
+            spine.set_color('#e2e8f0')
+        st.pyplot(fig)
+        
+        st.subheader("🔍 Factors")
+        # SHAP Explanation
+        shap_values = explainer.shap_values(df_processed)
+        feature_imp = [
+            {"feature": f, "value": float(val)} 
+            for f, val in zip(features, shap_values[0])
+        ]
+        feature_imp.sort(key=lambda x: abs(x["value"]), reverse=True)
+        shap_df = pd.DataFrame(feature_imp).head(4)
+        
+        fig_s, ax_s = plt.subplots(figsize=(6, 2.5), facecolor='none')
+        ax_s.set_facecolor('none')
+        colors = ['#e11d48' if v > 0 else '#16a34a' for v in shap_df['value']]
+        ax_s.barh(shap_df['feature'], shap_df['value'], color=colors)
+        ax_s.invert_yaxis()
+        ax_s.tick_params(labelsize=8, colors='#64748b')
+        for spine in ax_s.spines.values():
+            spine.set_color('#e2e8f0')
+        st.pyplot(fig_s)
             
             # Diagnostic Text
             top_f = shap_df.iloc[0]['feature']
