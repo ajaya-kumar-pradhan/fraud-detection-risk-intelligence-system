@@ -1,120 +1,83 @@
-# Fraud Risk Intelligence System
-### Decision Support Engine for Financial Transaction Security
+# 🛡️ Fraud Risk Intelligence System
 
-This repository contains a high-performance system designed to identify and analyze fraudulent patterns in financial transaction data. By combining gradient-boosted decision trees with real-time API services and an interactive investigation dashboard, it provides a comprehensive solution for security teams to monitor and mitigate risk.
-
-![Python](https://img.shields.io/badge/Python-3.10-blue?style=flat&logo=python)
-![XGBoost](https://img.shields.io/badge/XGBoost-3.2-red?style=flat&logo=xgboost)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.3-orange?style=flat&logo=scikit-learn)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat&logo=fastapi)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.40-FF4B4B?style=flat&logo=streamlit)
+> **XGBoost · SHAP · Financial Forensics · Streamlit Deployment**
 
 ---
 
-## 🏦 The Challenge
+## 🚀 Live Demo
+**Click the link below to scan transactions for fraud risk instantly (Free & Always On):**
 
-Financial institutions face billions in losses annually due to sophisticated fraud exploits. Traditional rule-based systems often struggle with high false-positive rates or fail to detect subtle anomalies in complex transaction flows. This system addresses these challenges by analyzing transactional "DNA" and balance inconsistencies to identify risk markers in real-time.
-
----
-
-## 🎯 Project Objectives
-
-*   **Real-Time Classification:** Rapid identification of suspicious transactions using a low-latency API.
-*   **Handling Class Imbalance:** Optimization strategies for datasets with extreme imbalance (~0.13% fraud rate).
-*   **Analyst Intelligence:** A professional dashboard providing diagnostic insights into why specific transactions are flagged.
-*   **Risk Sensitivity Testing:** Tools to simulate transaction variations and observe their impact on risk scores.
+### 👉 [**Launch Fraud Risk Intelligence Dashboard**](https://huggingface.co/spaces/ajayapradhanconnect/Fraud-Detection-Risk-Intelligence-System)
 
 ---
 
-## 📊 Dataset & Features
+## 📌 Project Overview
+The **Fraud Risk Intelligence System** is an enterprise-grade AI solution designed to monitor financial transactions for fraudulent activity in real-time. By combining a high-performance **XGBoost** model with **SHAP (Explainable AI)**, the system not only flags suspicious transfers but also provides a transparent "Diagnostic Summary," explaining *why* a particular transaction was flagged as risky.
 
-The system is trained on a dataset of over **6 million transactions**, focusing on structural discrepancies between expected and actual balances.
-
-| Attribute | Detail |
-| :--- | :--- |
-| **Volume** | 6 Million+ Records |
-| **Domain** | Digital Banking / FinTech |
-| **Class Imbalance** | 0.13% Fraudulent Cases |
-| **Primary Vectors** | `TRANSFER` and `CASH_OUT` operations |
-
-### Feature Engineering
-We developed specialized features to capture accounting bypass exploits:
-- **`errorBalanceOrig`**: Discrepancy between sender's initial balance, transaction amount, and reported final balance.
-- **`errorBalanceDest`**: Discrepancy in the recipient's balance logic.
-- **`hour_of_day`**: Temporal patterns derived from transaction sequence steps.
+### 🌟 Key Features
+- **In-Memory Risk Scoring**: Real-time inference on transactional data.
+- **Explainable AI (XAI)**: Visualizes the exact features (amount, type, etc.) driving the risk score.
+- **Stress Testing Engine**: Interactive "What-If" scenarios to map risk sensitivity to transaction volume.
+- **Structural Anomaly Detection**: Identifies "Error Balance" patterns common in ledger-based fraud.
+- **Modern Dark/Light UI**: Professional dashboard interface for financial analysts.
 
 ---
 
-## ⚙️ Methodology & Performance
+## 🧠 The Intelligence Engine
+The system utilizes a monolithic architecture where the model and interpretability logic are integrated directly into the dashboard for zero-latency analysis.
 
-### Model Optimization
-We utilized **XGBoost** with a cost-sensitive learning approach. By adjusting the `scale_pos_weight` parameter, we forced the model to prioritize detection of the rare minority class without the noise introduced by oversampling techniques like SMOTE.
-
-### Evaluation Metrics
-We prioritize **Precision-Recall AUC (PR-AUC)** over traditional ROC-AUC. In fraud detection, it is critical that when an alert is generated, the likelihood of actual fraud is high to minimize operational fatigue for security analysts.
+- **Model**: XGBoost (Extreme Gradient Boosting) optimized for imbalanced financial data.
+- **Interpretability**: SHAP (SHapley Additive exPlanations) for local feature contribution mapping.
+- **Validation**: Automated "Accounting Audit" of sender/recipient balance consistency.
 
 ---
 
-## 🌐 System Architecture
-
-### 1. Backend Service (`api.py`)
-A FastAPI-based REST service that provides endpoints for prediction and model interpretability.
-- `POST /predict`: Generates a real-time risk score.
-- `POST /explain`: Returns mathematical drivers for a specific transaction level.
-
-### 2. Investigation Dashboard (`app.py`)
-A professional-grade interface for risk analysts to input transaction details, view risk metrics, and perform sensitivity analysis through "What-If" simulations.
+## 🛠️ Tech Stack
+- **Backend**: Python, XGBoost, Scikit-learn, joblib.
+- **Explainability**: SHAP, Matplotlib.
+- **Frontend**: Streamlit (with Custom CSS).
+- **Deployment**: Hugging Face Spaces.
 
 ---
 
 ## 📁 Project Structure
-
-```
+```text
 fraud-detection-risk-intelligence-system/
-├── app.py                # Redesigned Investigation Dashboard
-├── api.py                # FastAPI REST Service
-├── Fraud_Detection_ML.py # Model Training & Pipeline logic
-├── model_artifacts/      # Serialized models and feature configurations
-├── README.md             # Technical Documentation
-└── requirements.txt      # Project Dependencies
+├── app.py                      # Main Intelligence Dashboard
+├── requirements.txt            # Production Dependencies
+├── model_artifacts/            # Core Engine Files
+│   ├── xgboost_fraud_model.json
+│   ├── feature_columns.joblib
+│   └── threshold.txt
+└── README.md                  # You are here!
 ```
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Installation
-```bash
-git clone https://github.com/ajaya-kumar-pradhan/fraud-detection-risk-intelligence-system.git
-cd fraud-detection-risk-intelligence-system
-pip install -r requirements.txt
-```
-
-### 2. Startup
-The system requires both the backend and frontend to be active.
-
-**Start the Service Interface:**
-```bash
-uvicorn api:app --port 8000
-```
-
-**Start the Analyst Dashboard:**
-```bash
-streamlit run app.py
-```
-
----
-
-## 🛠️ Technical Stack
-
-- **Language:** Python 3.10+
-- **Modeling:** XGBoost, Scikit-learn, SHAP
-- **Data:** Pandas, NumPy
-- **Communication:** FastAPI (Uvicorn), Requests
-- **Interface:** Streamlit, Matplotlib
+## 📦 Run Locally
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/ajaya-kumar-pradhan/fraud-detection-risk-intelligence-system.git
+   cd fraud-detection-risk-intelligence-system
+   ```
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Launch the system**
+   ```bash
+   streamlit run app.py
+   ```
 
 ---
 
 ## 👤 Author
-**Ajaya Kumar Pradhan**
-*Data Analyst | Machine Learning Enthusiast*
+**Ajaya Kumar Pradhan**  
+Data Analyst · Power BI Developer · ML Engineer  
+📍 Bhubaneswar, Odisha, India
+
+[![GitHub](https://img.shields.io/badge/GitHub-ajayaconnect-181717?style=flat-square&logo=github)](https://github.com/ajaya-kumar-pradhan)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/)
+
+---
+*Built as part of Enterprise Risk Management Portfolio.*
