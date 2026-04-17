@@ -7,282 +7,265 @@ import joblib
 import shap
 import xgboost as xgb
 
-# ================================
-# ⚙️ SYSTEM CONFIGURATION
-# ================================
+# ==========================================
+# 🛡️ TRANSACTION FRAUD DETECTOR
+# Professional financial analysis dashboard.
+# ==========================================
 
-def setup_page():
-    """Configures the aesthetic layout of the dashboard."""
+def setup_app():
+    """Sets up the professional interface and styling."""
     st.set_page_config(
-        page_title="Fraud Risk Intelligence",
+        page_title="Fraud Detector",
         page_icon="🛡️",
         layout="centered"
     )
-    
-    # 🏛️ Airline-Style Stability System
+
+    # 👔 Professional "Clean Finance" Styling
     st.markdown("""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
+        /* 1. Reset to Standard Colors */
         html, body, [data-testid="stAppViewContainer"] {
-            background-color: #f8faff !important;
-            color: #1e293b;
+            background-color: #fcfcfc !important;
+            color: #334155;
             font-family: 'Inter', sans-serif;
         }
 
-        .glass-card {
-            background: #ffffff;
+        /* 2. Professional Dashboard Cards */
+        .report-card {
+            background-color: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        [data-testid="stMetric"] {
-            background: #ffffff !important;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px !important;
-        }
-
-        .stButton>button {
-            width: 100%;
-            background: #4f46e5;
-            color: white !important;
-            border-radius: 10px;
-            padding: 12px;
-            font-weight: 600;
-            border: none;
-        }
-
-        h1, h2, h3 {
-            color: #0f172a !important;
-            font-weight: 800 !important;
-            margin-top: 0px !important;
+        /* 3. Navigation & Actions */
+        [data-testid="stSidebar"] {
+            background-color: #ffffff !important;
+            border-right: 1px solid #e2e8f0;
         }
         
+        .stButton>button {
+            width: 100%;
+            background-color: #1e40af; /* Navy Blue */
+            color: white !important;
+            border-radius: 6px;
+            padding: 10px;
+            font-weight: 500;
+            border: none;
+        }
+        .stButton>button:hover {
+            background-color: #1e3a8a;
+        }
+
+        /* 4. Typography Header */
+        h1, h2, h3 {
+            color: #0f172a !important;
+            font-weight: 700 !important;
+        }
+        
+        .status-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            background-color: #f1f5f9;
+            color: #64748b;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* 5. Hide Elements for Cleanliness */
         #MainMenu, footer, header { visibility: hidden; }
+        .stDeployButton { display: none; }
         </style>
     """, unsafe_allow_html=True)
 
-# ================================
-# 🧠 INTELLIGENCE ENGINE (MONOLITHIC)
-# ================================
+# ==========================================
+# 🧠 LOAD ANALYSIS MODELS
+# ==========================================
 
 @st.cache_resource
-def load_assets():
-    """Loads model and artifacts once and caches them for performance. Checks multiple locations."""
-    # List of possible locations
-    base_dirs = [
+def get_analysis_tools():
+    """Loads the fraud model and diagnostic tools."""
+    # Check for artifacts in standard locations
+    dirs = [
         os.path.join(os.path.dirname(__file__), "model_artifacts"),
-        os.path.dirname(__file__) # Root directory
+        os.path.dirname(__file__)
     ]
     
-    model_path = None
-    features_path = None
-    threshold_path = None
-    
-    # Search for the files
-    for d in base_dirs:
+    m_path, f_path, t_path = None, None, None
+    for d in dirs:
         m = os.path.join(d, 'xgboost_fraud_model.json')
         f = os.path.join(d, 'feature_columns.joblib')
         t = os.path.join(d, 'threshold.txt')
-        
-        if os.path.exists(m) and os.path.exists(f) and os.path.exists(t):
-            model_path, features_path, threshold_path = m, f, t
+        if all(os.path.exists(p) for p in [m, f, t]):
+            m_path, f_path, t_path = m, f, t
             break
             
-    if not model_path:
+    if not m_path:
+        st.error("Model files not found. Please verify the repository structure.")
         return None, None, None, None
         
-    # Load XGBoost Model
     model = xgb.XGBClassifier()
-    model.load_model(model_path)
+    model.load_model(m_path)
+    features = joblib.load(f_path)
     
-    # Load Feature Columns
-    features = joblib.load(features_path)
-    
-    # Load Threshold
-    with open(threshold_path, 'r') as f_ptr:
+    with open(t_path, 'r') as f_ptr:
         threshold = float(f_ptr.read().strip())
         
-    # Initialize SHAP Explainer
     explainer = shap.TreeExplainer(model)
-    
     return model, features, threshold, explainer
 
-def preprocess_transaction(payload, features):
-    """Local preprocessing logic migrated from api.py."""
-    df = pd.DataFrame([payload])
+def prepare_data(data, features):
+    """Processes transaction data for the model."""
+    df = pd.DataFrame([data])
     
-    # Engineering smart features
+    # Feature Engineering
     df['errorBalanceOrig'] = df['newbalanceOrig'] + df['amount'] - df['oldbalanceOrg']
     df['errorBalanceDest'] = df['oldbalanceDest'] + df['amount'] - df['newbalanceDest']
     df['hour_of_day'] = df['step'] % 24
     
-    # Feature Alignment (One-Hot Encoding handling)
-    out_dict = {}
+    # Matching model features
+    out = {}
     for col in features:
         if col in df.columns:
-            out_dict[col] = df[col].iloc[0]
+            out[col] = df[col].iloc[0]
         elif col.startswith('type_'):
-            type_val = col.split('_')[1]
-            out_dict[col] = 1 if payload['type'] == type_val else 0
+            t = col.split('_')[1]
+            out[col] = 1 if data['type'] == t else 0
         else:
-            out_dict[col] = 0
-            
-    return pd.DataFrame([out_dict])
+            out[col] = 0
+    return pd.DataFrame([out])
 
-# ================================
-# 📊 UI COMPONENTS
-# ================================
+# ==========================================
+# 🖥️ USER INTERFACE
+# ==========================================
 
-class ControlPanel:
-    """Handles the sidebar configuration and transaction data entry."""
-    @staticmethod
-    def render():
-        with st.sidebar:
-            st.title("🛡️ Risk Parameters")
-            st.caption("Configure transaction details for direct analysis")
-            
-            step = st.number_input("Step (Hours since start)", min_value=1, value=1)
-            type_tx = st.selectbox("Transaction Type", ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"])
-            amount = st.number_input("Amount ($)", min_value=0.0, value=2500.0, step=100.0)
-            
-            st.divider()
-            st.subheader("Account Verification")
-            old_orig = st.number_input("Sender Original Balance", value=5000.0)
-            new_orig = st.number_input("Sender Final Balance", value=2500.0)
-            old_dest = st.number_input("Recipient Original Balance", value=0.0)
-            new_dest = st.number_input("Recipient Final Balance", value=2500.0)
-            
-            submit = st.button("Analyze Risk Profile", type="primary", use_container_width=True)
-            
-            return {
-                "payload": {
-                    "step": step, "type": type_tx, "amount": amount,
-                    "oldbalanceOrg": old_orig, "newbalanceOrig": new_orig,
-                    "oldbalanceDest": old_dest, "newbalanceDest": new_dest
-                },
-                "submit": submit
-            }
-
-def main():
-    setup_page()
+def run_app():
+    setup_app()
     
-    # 📋 Premium Header (Light)
+    # Header Section
     st.markdown("""
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 2rem;">🛡️</span>
-                <div>
-                    <h2 style="margin: 0; line-height: 1; color: #0f172a;">FRAUD RISK INTELLIGENCE</h2>
-                    <p style="margin: 0; font-size: 0.7rem; color: #4f46e5; letter-spacing: 2px; font-weight: 700;">V5.0 ENTERPRISE PLATFORM • ONLINE</p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <p style="margin: 0; font-size: 0.7rem; color: #64748b;">SYSTEM STATUS</p>
-                <p style="margin: 0; font-size: 0.8rem; color: #16a34a; font-weight: 800;">● OPERATIONAL</p>
-            </div>
+        <div style="margin-bottom: 30px;">
+            <p class="status-pill">SECURE SESSION ENCRYPTED</p>
+            <h1 style="margin: 0; font-size: 2.2rem;">Fraud Detection App</h1>
+            <p style="color: #64748b; font-size: 0.9rem;">Analyze and audit transaction risk in real-time.</p>
         </div>
     """, unsafe_allow_html=True)
     
-    # Load Intelligence Engine
-    with st.spinner("Initializing Intelligence Engine..."):
-        model, features, threshold, explainer = load_assets()
-    
-    config = ControlPanel.render()
-    
-    if config["submit"]:
-        payload = config["payload"]
+    # Load Tools
+    model, features, threshold, explainer = get_analysis_tools()
+    if not model: return
+
+    # Sidebar: Input Form
+    with st.sidebar:
+        st.markdown("### Transaction Details")
+        st.write("Enter the transaction data below to check for risk.")
         
-        # 1. Prediction Workflow
-        df_processed = preprocess_transaction(payload, features)
-        proba = model.predict_proba(df_processed)[0][1]
-        is_fraud = bool(proba >= threshold)
+        step = st.number_input("Time Step (Hour)", min_value=1, value=1)
+        tx_type = st.selectbox("Transaction Type", ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"])
+        amount = st.number_input("Amount ($)", min_value=0.0, value=2500.0)
         
-        # 📊 Intelligence Result (Centered & Stable)
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.subheader("🔮 Intelligence Result")
+        st.write("---")
+        st.write("**Account Balances**")
+        old_orig = st.number_input("Sender Initial Balance", value=5000.0)
+        new_orig = st.number_input("Sender Final Balance", value=2500.0)
+        old_dest = st.number_input("Recipient Initial Balance", value=0.0)
+        new_dest = st.number_input("Recipient Final Balance", value=2500.0)
+        
+        analyze = st.button("Run Risk Analysis")
+
+    if analyze:
+        payload = {
+            "step": step, "type": tx_type, "amount": amount,
+            "oldbalanceOrg": old_orig, "newbalanceOrig": new_orig,
+            "oldbalanceDest": old_dest, "newbalanceDest": new_dest
+        }
+        
+        # Calculation
+        data_processed = prepare_data(payload, features)
+        prob = model.predict_proba(data_processed)[0][1]
+        is_fraud = prob >= threshold
+        
+        # DISPLAY RESULTS
+        st.markdown('<div class="report-card">', unsafe_allow_html=True)
+        st.subheader("Analysis Result")
         
         if is_fraud:
-            st.markdown(f"""
-                <div style="text-align: center; padding: 25px; background: #fff1f2; border-radius: 12px; border: 1px solid #fda4af; margin-bottom: 20px;">
-                    <h4 style="color: #be123c; margin: 0;">⚠️ FRAUDULENT DETECTED</h4>
-                    <h1 style="color: #be123c; margin: 0; font-size: 3rem;">{proba:.1%}</h1>
-                    <p style="color: #9f1239; margin-top: 10px;">HIGH RISK PROFILE IDENTIFIED</p>
-                </div>
-            """, unsafe_allow_html=True)
+            st.error(f"**High Risk Detected** ({prob:.1%})")
+            st.write("This transaction exhibits patterns consistent with fraudulent activity.")
         else:
-            st.markdown(f"""
-                <div style="text-align: center; padding: 25px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 20px;">
-                    <h4 style="color: #15803d; margin: 0;">✅ LEGITIMATE VERIFIED</h4>
-                    <h1 style="color: #15803d; margin: 0; font-size: 3rem;">{(1-proba):.1%}</h1>
-                    <p style="color: #166534; margin-top: 10px;">SYSTEMIC TRUST VERIFIED</p>
-                </div>
-            """, unsafe_allow_html=True)
-
-        # Sub-metrics
-        st.metric("Risk Probability", f"{proba*100:.1f}%")
-        st.metric("Risk Status", "CRITICAL" if proba > 0.8 else "ELEVATED" if proba > 0.4 else "STABLE")
+            st.success(f"**Legitimate Transaction** (Trust Level: {(1-prob):.1%})")
+            st.write("No significant risk patterns were detected for this transaction.")
         
         st.markdown('</div>', unsafe_allow_html=True)
-        st.divider()
-        
-        st.subheader("📊 Engine Stability")
-        sens_df = pd.DataFrame(sens_results)
-        fig, ax = plt.subplots(figsize=(6, 2.5), facecolor='none')
-        ax.set_facecolor('none')
-        ax.plot(sens_df["Multiplier"], sens_df["Prob"], marker='o', color='#4f46e5', linewidth=1.5)
-        ax.set_ylim(0, 1)
-        ax.tick_params(labelsize=8, colors='#64748b')
-        for spine in ax.spines.values():
-            spine.set_color('#e2e8f0')
-        st.pyplot(fig)
-        
-        st.subheader("🔍 Factors")
-        # SHAP Explanation
-        shap_values = explainer.shap_values(df_processed)
-        feature_imp = [
-            {"feature": f, "value": float(val)} 
-            for f, val in zip(features, shap_values[0])
-        ]
-        feature_imp.sort(key=lambda x: abs(x["value"]), reverse=True)
-        shap_df = pd.DataFrame(feature_imp).head(4)
-        
-        fig_s, ax_s = plt.subplots(figsize=(6, 2.5), facecolor='none')
-        ax_s.set_facecolor('none')
-        colors = ['#e11d48' if v > 0 else '#16a34a' for v in shap_df['value']]
-        ax_s.barh(shap_df['feature'], shap_df['value'], color=colors)
-        ax_s.invert_yaxis()
-        ax_s.tick_params(labelsize=8, colors='#64748b')
-        for spine in ax_s.spines.values():
-            spine.set_color('#e2e8f0')
-        st.pyplot(fig_s)
+
+        # Detailed Report (Columns)
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("#### Risk Volatility")
+            # Simple Matplotlib
+            v_mults = [0.5, 1.0, 2.0, 5.0]
+            v_res = []
+            orig_off = payload["newbalanceOrig"] + payload["amount"] - payload["oldbalanceOrg"]
+            dest_off = payload["oldbalanceDest"] + payload["amount"] - payload["newbalanceDest"]
             
-        # Diagnostic Text
-        top_f = shap_df.iloc[0]['feature']
-        diag_style = st.info if not is_fraud else st.warning
-        diag_style(f"**Diagnostic Summary:** Primary risk driver identified as `{top_f}`. This factor is pushing the risk scoring toward {'Fraud' if shap_df.iloc[0]['value'] > 0 else 'Legitimate'} due to its statistical variance from historical baseline.")
+            for m in v_mults:
+                t_p = payload.copy()
+                t_p["amount"] = payload["amount"] * m
+                t_p["newbalanceOrig"] = max(0.0, payload["oldbalanceOrg"] - t_p["amount"] + orig_off)
+                t_p["newbalanceDest"] = max(0.0, payload["oldbalanceDest"] + t_p["amount"] - dest_off)
+                t_df = prepare_data(t_p, features)
+                v_res.append(model.predict_proba(t_df)[0][1])
+            
+            fig, ax = plt.subplots(figsize=(5, 3))
+            ax.plot(v_mults, v_res, 'o-', color='#1e40af', linewidth=2)
+            ax.set_title("Amount Sensitivity", fontsize=10)
+            ax.set_ylabel("Risk %", fontsize=8)
+            ax.set_xlabel("Transaction Multiplier", fontsize=8)
+            ax.grid(True, linestyle="--", alpha=0.5)
+            st.pyplot(fig)
+
+        with col2:
+            st.markdown("#### Primary Drivers")
+            # SHAP
+            shap_vals = explainer.shap_values(data_processed)
+            imps = [{"f": f, "v": float(v)} for f, v in zip(features, shap_vals[0])]
+            imps.sort(key=lambda x: abs(x["v"]), reverse=True)
+            top_imps = pd.DataFrame(imps).head(5)
+            
+            fig_s, ax_s = plt.subplots(figsize=(5, 3))
+            colors = ['#dc2626' if v > 0 else '#16a34a' for v in top_imps['v']]
+            ax_s.barh(top_imps['f'], top_imps['v'], color=colors)
+            ax_s.set_title("Feature Impact", fontsize=10)
+            ax_s.invert_yaxis()
+            st.pyplot(fig_s)
+            
+        # Summary Note
+        st.info(f"**Reviewer Note:** The primary factor contributing to this score is `{imps[0]['f']}`. Standard review protocol is recommended for all transactions with risk above 40%.")
 
     else:
-        # 🏛️ Minimalist Landing Page
-        st.markdown('<div class="glass-card" style="max-width: 800px; margin: 0 auto; text-align: center; padding: 60px 20px;">', unsafe_allow_html=True)
-        
+        # Welcome Page (Human Design)
         st.markdown("""
-            <h1 style="font-size: 2.5rem; margin-bottom: 20px;">FRAUD RISK<br><span style="color: #4f46e5;">INTELLIGENCE</span></h1>
-            <p style="color: #64748b; font-size: 1.1rem; line-height: 1.6;">
-            A high-performance intelligence system for real-time financial tracking and anomaly detection.
-            </p>
-            <div style="text-align: left; max-width: 500px; margin: 40px auto; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
-                <p style="margin-bottom: 12px;">✅ <b>Instant Scoring:</b> Zero-latency in-memory engine.</p>
-                <p style="margin-bottom: 12px;">✅ <b>Explainable AI:</b> Transparent SHAP diagnostics.</p>
-                <p style="margin-bottom: 12px;">✅ <b>Audit Ready:</b> Automated ledger validation.</p>
+            <div style="text-align: center; padding: 60px 0;">
+                <h2 style="color: #1e40af;">Ready to Audit Transactions</h2>
+                <p style="color: #64748b; max-width: 500px; margin: 0 auto;">
+                    This application helps you identify high-risk transactions by comparing them with historical patterns in bank ledgers. 
+                </p>
+                <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; background: #ffffff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <p>🔵 <b>Simple Input:</b> Enter Sender/Receiver balances.</p>
+                    <p>🔴 <b>Risk Scoring:</b> Get a probability of fraud instantly.</p>
+                    <p>🟢 <b>Clear Audit:</b> Understand the exact factors driving the score.</p>
+                </div>
+                <p style="margin-top: 40px; font-size: 0.8rem; color: #94a3b8;">
+                    Enter transaction details in the left sidebar to begin.
+                </p>
             </div>
-            <p style="color: #94a3b8; font-size: 0.8rem; letter-spacing: 1px;">Ready to initiate scan. Use sidebar to start.</p>
         """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    main()
+    run_app()
