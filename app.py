@@ -360,44 +360,41 @@ def main():
             diag_style(f"**Diagnostic Summary:** Primary risk driver identified as `{top_f}`. This factor is pushing the risk scoring toward {'Fraud' if shap_df.iloc[0]['value'] > 0 else 'Legitimate'} due to its statistical variance from historical baseline.")
 
     else:
-        # 🛸 Cyberpunk Landing Page
-        st.markdown('<div class="glass-card" style="padding: 60px 40px;">', unsafe_allow_html=True)
-        colA, colB = st.columns([1.1, 1], gap="large")
-        with colA:
-            st.markdown("""
-                <h1 style="margin-bottom: 25px;">NEXT-GEN RISK<br><span style="color: #00f2ff; -webkit-text-fill-color: #00f2ff;">GOVERNANCE</span></h1>
-                <p style="font-size: 1.1rem; color: #94a3b8; line-height: 1.6;">
-                This dashboard utilizes a high-performance <b>Monolithic Architecture</b> for real-time financial tracking and anomaly detection.
+        # 🛸 Cyberpunk Landing Page (Stabilized)
+        st.markdown('<div class="glass-card" style="padding: 80px 40px; text-align: center; max-width: 900px; margin: 0 auto;">', unsafe_allow_html=True)
+        
+        st.markdown("""
+            <h1 style="margin-bottom: 25px; font-size: 3.5rem;">NEXT-GEN RISK<br><span style="color: #00f2ff; -webkit-text-fill-color: #00f2ff;">GOVERNANCE</span></h1>
+            <p style="font-size: 1.2rem; color: #94a3b8; line-height: 1.6; max-width: 700px; margin: 0 auto;">
+            This dashboard utilizes a high-performance <b>Monolithic Architecture</b> for real-time financial tracking and anomaly detection.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 50px; text-align: left;">
+                <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: #00f2ff; font-weight: 800; font-size: 1.1rem;">⚡ ZERO LATENCY</span><br>
+                    <span style="font-size: 0.9rem; color: #64748b;">Direct In-Memory Inference engine for instant scoring.</span>
+                </div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: #00ff88; font-weight: 800; font-size: 1.1rem;">🔍 EXPLAINABLE</span><br>
+                    <span style="font-size: 0.9rem; color: #64748b;">Real-time SHAP local explanations for full transparency.</span>
+                </div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: #ff0055; font-weight: 800; font-size: 1.1rem;">🧪 STRESS TEST</span><br>
+                    <span style="font-size: 0.9rem; color: #64748b;">Built-in sensitivity analysis for "What-If" scenarios.</span>
+                </div>
+                <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                    <span style="color: #7000ff; font-weight: 800; font-size: 1.1rem;">📝 AUDIT READY</span><br>
+                    <span style="font-size: 0.9rem; color: #64748b;">Automated balance consistency and audit logging.</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.05);">
+                <p style="color: #94a3b8; font-style: italic; font-size: 1rem; opacity: 0.8;">
+                "Empowering financial institutions with transparent, deep-learning-driven risk mitigation."
                 </p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 35px;">
-                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <span style="color: #00f2ff; font-weight: 800;">⚡ ZERO LATENCY</span><br>
-                        <span style="font-size: 0.8rem; color: #64748b;">Direct In-Memory Inference</span>
-                    </div>
-                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <span style="color: #00ff88; font-weight: 800;">🔍 EXPLAINABLE</span><br>
-                        <span style="font-size: 0.8rem; color: #64748b;">Real-time SHAP Diagnostics</span>
-                    </div>
-                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <span style="color: #ff0055; font-weight: 800;">🧪 STRESS TEST</span><br>
-                        <span style="font-size: 0.8rem; color: #64748b;">Predictive What-If Scenarios</span>
-                    </div>
-                    <div style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <span style="color: #7000ff; font-weight: 800;">📝 AUDIT READY</span><br>
-                        <span style="font-size: 0.8rem; color: #64748b;">Automated Balance Verification</span>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-        with colB:
-            st.image("https://img.freepik.com/free-vector/digital-technology-background-vector-with-mesh-gradient-blue-pink_53876-136544.jpg", use_container_width=True)
-            st.markdown("""
-                <div style="text-align: center; margin-top: 20px;">
-                    <p style="color: #94a3b8; font-style: italic; font-size: 0.9rem;">
-                    "Empowering financial institutions with transparent, 
-                    deep-learning-driven risk mitigation."
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
+                <p style="color: #00f2ff; font-size: 0.7rem; margin-top: 15px; letter-spacing: 2px;">READY FOR SYSTEM SCAN</p>
+            </div>
+        """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 if __name__ == "__main__":
