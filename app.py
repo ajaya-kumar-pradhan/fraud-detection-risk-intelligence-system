@@ -191,18 +191,21 @@ def run_app():
         prob = model.predict_proba(data_processed)[0][1]
         is_fraud = prob >= threshold
         
-        # DISPLAY RESULTS
-        st.markdown('<div class="report-card">', unsafe_allow_html=True)
-        st.subheader("Analysis Result")
-        
-        if is_fraud:
-            st.error(f"**High Risk Detected** ({prob:.1%})")
-            st.write("This transaction exhibits patterns consistent with fraudulent activity.")
-        else:
-            st.success(f"**Legitimate Transaction** (Trust Level: {(1-prob):.1%})")
-            st.write("No significant risk patterns were detected for this transaction.")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+        # 📝 ANALYSIS REPORT
+        st.markdown(f"""
+            <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 25px; margin-bottom: 25px;">
+                <h3 style="margin: 0; color: #0f172a;">Analysis Result</h3>
+                <div style="margin-top: 15px; padding: 20px; border-radius: 6px; background-color: {'#fff1f2' if is_fraud else '#f0fdf4'}; border: 1px solid {'#fda4af' if is_fraud else '#bbf7d0'};">
+                    <h4 style="margin: 0; color: {'#be123c' if is_fraud else '#15803d'};">
+                        { '⚠️ High Risk Detected' if is_fraud else '✅ Legitimate Transaction' }
+                    </h4>
+                    <p style="margin: 10px 0 0 0; color: {'#9f1239' if is_fraud else '#166534'}; font-size: 0.95rem;">
+                        { 'Patterns consistent with fraudulent activity identified.' if is_fraud else 'No significant risk patterns detected for this transaction.' }
+                        <br><b>Trust Score: {(1-prob):.1%}</b>
+                    </p>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
 
         # Detailed Report (Columns)
         col1, col2 = st.columns(2)
