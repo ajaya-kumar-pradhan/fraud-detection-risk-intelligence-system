@@ -21,6 +21,11 @@ def setup_page():
     
     st.markdown("""
         <style>
+        /* Fix for layout shaking */
+        html {
+            overflow-anchor: none;
+            scroll-behavior: auto;
+        }
         .main {
             background-color: #f8f9fa;
         }
@@ -29,13 +34,16 @@ def setup_page():
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            white-space: nowrap;
         }
         .stButton>button {
             border-radius: 5px;
             font-weight: 600;
         }
+        /* Prevent header jumping */
         h1, h2, h3 {
             color: #1e293b;
+            margin-top: 0px !important;
         }
         </style>
     """, unsafe_allow_html=True)
