@@ -261,10 +261,10 @@ def main():
             spine.set_color('#e2e8f0')
         st.pyplot(fig_s)
             
-            # Diagnostic Text
-            top_f = shap_df.iloc[0]['feature']
-            diag_style = st.info if not is_fraud else st.warning
-            diag_style(f"**Diagnostic Summary:** Primary risk driver identified as `{top_f}`. This factor is pushing the risk scoring toward {'Fraud' if shap_df.iloc[0]['value'] > 0 else 'Legitimate'} due to its statistical variance from historical baseline.")
+        # Diagnostic Text
+        top_f = shap_df.iloc[0]['feature']
+        diag_style = st.info if not is_fraud else st.warning
+        diag_style(f"**Diagnostic Summary:** Primary risk driver identified as `{top_f}`. This factor is pushing the risk scoring toward {'Fraud' if shap_df.iloc[0]['value'] > 0 else 'Legitimate'} due to its statistical variance from historical baseline.")
 
     else:
         # 🏛️ Minimalist Landing Page
