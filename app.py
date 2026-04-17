@@ -328,7 +328,7 @@ def main():
             ax.set_xlabel("Transaction Multiplier", color='#94a3b8')
             ax.tick_params(colors='#94a3b8')
             for spine in ax.spines.values():
-                spine.set_color('rgba(255,255,255,0.1)')
+                spine.set_color((1, 1, 1, 0.1))
             ax.grid(axis='y', linestyle='--', alpha=0.1)
             st.pyplot(fig)
             
@@ -351,7 +351,7 @@ def main():
             ax_s.set_xlabel("SHAP Impact Score", color='#94a3b8')
             ax_s.tick_params(colors='#94a3b8')
             for spine in ax_s.spines.values():
-                spine.set_color('rgba(255,255,255,0.1)')
+                spine.set_color((1, 1, 1, 0.1))
             st.pyplot(fig_s)
             
             # Diagnostic Text
